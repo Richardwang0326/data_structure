@@ -4,6 +4,7 @@
 
 class LinkedList; 
 
+
 class ListNode
 {
     private:  
@@ -27,7 +28,109 @@ class LinkedList
         void Delete_all(int x);         // delete all x in the list
         void Clear();                   // delete all list
         void Reverse();                 // reverse all list 
+        int listtoint();                // transform list to int
+        LinkedList operator+(const LinkedList&);        // operator overload
 };
+
+// carry
+bool iscarry(int x)
+{
+    bool carry = false;
+    if(x >= 10)
+        carry = true;
+
+    return carry;
+}
+
+LinkedList LinkedList::operator+(const LinkedList& list)
+{
+    LinkedList sum;
+    bool carry = false;
+
+    ListNode* cur1 = this->first;
+    ListNode* cur2 = list.first;
+
+    while(1)
+    {
+        if((cur1 != NULL) || (cur2 != NULL))
+        {
+            if(cur1 == NULL)
+            {
+                if(carry)
+                    cur2->number += 1;
+                carry = iscarry(cur2->number);
+                if(carry)
+                    sum.Push_back(cur2->number % 10);
+                else 
+                    sum.Push_back(cur2->number);
+                cur2 = cur2->next;
+            }
+            else if(cur2 == NULL)
+            {
+                if(carry)
+                    cur1->number += 1;
+                carry = iscarry(cur1->number);
+                if(carry)
+                    sum.Push_back(cur1->number % 10);
+                else 
+                    sum.Push_back(cur1->number);
+                cur1 = cur1->next;
+            }
+            else
+            {
+                if(carry)
+                    cur1->number += 1;
+                carry = iscarry(cur1->number + cur2->number);
+                if(carry)
+                    sum.Push_back((cur1->number + cur2->number) % 10);
+                else
+                    sum.Push_back(cur1->number + cur2->number);
+                cur1 = cur1->next;
+                cur2 = cur2->next;
+            }
+        }
+        else 
+        {
+            if(carry)
+            {
+                sum.Push_back(1);
+                carry = false;
+            }
+            else
+                break;
+        }
+    }
+    return sum;
+}
+
+// transform int to list
+LinkedList inttolist(int x)
+{
+    LinkedList result;
+
+    while(x>=10)
+    {
+        result.Push_back(x % 10);
+        x /= 10;
+    }
+    result.Push_back(x);
+
+    return result;
+}
+
+int LinkedList::listtoint()
+{
+    int num = 0;
+    Reverse();
+    ListNode* current = first;
+
+    while(current != NULL)
+    {
+        num = num * 10 + current->number;
+        current = current->next;
+    }
+    return num;
+}
 
 void LinkedList::Reverse()
 {
@@ -48,8 +151,6 @@ void LinkedList::Reverse()
     }
 
     current->next = previous;
-    std::cout << "reverse all number in the list" << std::endl;
-
 }
 
 void LinkedList::Clear()
@@ -166,36 +267,20 @@ void LinkedList::Push_back(int x)
 
 int main()
 {
-    LinkedList l1;
+    int num1,num2,num3;
+    std::cout << "input number: ";
+    std::cin >> num1;
+
+    std::cout << "input number: ";
+    std::cin >> num2;
+    std::cout << std::endl;
     
-    l1.Push_back(1);
-    l1.Push_front(9);
-    l1.Push_back(2);
-    l1.Push_back(5);
-    l1.Push_front(6);
-    l1.PrintList();
-    // 6 9 1 2 5
-
-    l1.Push_back(2);
-    l1.Push_front(2);
-    l1.PrintList();
-    // 2 6 9 1 2 5 2
-
-    l1.Delete(2);
-    l1.Delete(7);
-    l1.PrintList();
-    // 6 9 1 2 5 2
-
-    l1.Delete_all(2);
-    l1.PrintList();
-    // 6 9 1 5 
-
-    l1.Reverse();
-    l1.PrintList();
-    // 5 1 9 6 
-
-    l1.Clear();
-    l1.PrintList();
+    LinkedList list1 = inttolist(num1);
+    LinkedList list2 = inttolist(num2);
+    LinkedList list3 = inttolist(num3);
+    LinkedList sum = list1 + list2;
+    
+    std::cout << num1 << " + " << num2 << " = "<< sum.listtoint() << std::endl; 
 
     return 0;
 }
